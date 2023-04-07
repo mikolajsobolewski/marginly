@@ -1,0 +1,23 @@
+---
+name: Minifront workflow
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get short commit hash
+        run: echo "::set-env name=SHORT_SHA::$(git rev-parse --short HEAD)"
+        shell: bash
+        env:
+          SHORT_SHA: ${{ steps.get_short_sha.outputs.short_sha }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the minifront image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: $GITHUB_ACTOR/marginly-minifront:latest
